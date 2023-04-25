@@ -286,3 +286,45 @@ def calculate_results(y_true, y_pred):
                   "recall": model_recall,
                   "f1": model_f1}
   return model_results
+import random
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import tensorflow as tf
+
+def visualize_and_predict(model, image_dir = 'test/'):
+  """Visualizes and Makes prediction on an image from a test folder
+  Arguments:
+  Model - A CNN classfiation model
+  image_dir = A directory cotaining images of different classes
+  image_dir\
+  ....Class 1\
+        img1
+        img2
+  .....Class 2\
+        img1
+        img2
+   .........
+  
+  """
+  class_names  = sorted(os.listdir(image_dir))
+  target_class = random.choice(class_names)
+  random_img_name  = random.choice(os.listdir(os.path.join(image_dir, target_class)))
+  path_to_image = os.path.join(image_dir, target_class, random_img_name) 
+  img =   mpimg.imread(path_to_image)
+
+  # Reshape the image to match the shape expected by the network.
+  expected_shape = model.input_shape
+  reshaped_img = tf.expand_dims(tf.image.resize(img, expected_shape[1:3]), axis=0)
+  
+  # Make predictions with the image
+  pred_probs = model.predict(reshaped_img)
+  pred_class = class_names[tf.argmax(tf.squeeze(pred_probs))]
+
+  # Visualize the image
+  plt.imshow(img)
+  title_txt = f'Original class: {target_class}\n Predicted Class: {pred_class}'
+  if pred_class==target_class:
+     plt.title(title_txt, c = 'g')
+  else:
+     plt.title(title_txt, c = 'r')
+  plt.axis(False)
