@@ -2,6 +2,7 @@
 ### Storing them here so they're easily accessible.
 
 import tensorflow as tf
+import pandas as pd
 
 # Create a function to import an image and resize it to be able to be used with our model
 def load_and_prep_image(filename, img_shape=224, scale=True):
@@ -328,3 +329,55 @@ def visualize_and_predict(model, image_dir = 'test/'):
   else:
      plt.title(title_txt, c = 'r')
   plt.axis(False)
+  
+  def read_and_process_text(filename):
+    """Reads and processes text data from filename
+    Returns a dictionary of the data of all text in file name grouped by abstract ID
+    """
+    abstracts_data = {}
+    lines_data    = []
+    text_data     = []
+    target_data  = []
+    abstract_ids = []
+    all_abstracts_lines = []
+    with open(filename) as file:
+      while True:
+        line = file.readline()
+        if not line:# Determine if it's end of the file
+          break
+          file.close() # Close the file
+        elif line.startswith('###'): # Start of related abstract lines
+            abstract_id = line.strip('###\n')
+            abstract_line_number = 0
+        elif ('\t') in line:
+            abstract_line_number+=1
+            target_and_text = line.split('\t')
+            target = target_and_text[0]
+            text   = target_and_text[1].strip('\n').lower()
+        # Append the text and target data to a list
+            text_data.append(text)
+            target_data.append(target)
+            lines_data.append(abstract_line_number)
+            abstract_ids.append(abstract_id)
+        elif line.isspace():
+      # Count the number of lines in an abstract and append them to a list
+          for i in range(abstract_line_number):
+            all_abstracts_lines.append(abstract_line_number) 
+    abstracts_data['abstract_id']  = abstract_ids
+    abstracts_data['text'] = text_data
+    abstracts_data['target'] = target_data
+    abstracts_data['line_number'] = lines_data
+    abstracts_data['total lines']  = all_abstracts_lines
+    abstracts_df = pd.DataFrame(abstracts_data)
+    return abstracts_df
+  
+  def split_sentence(sentence):
+    """Splits a sentence or list of sentences in a list of charaters.
+    """"
+    separator = ' '
+  if type(sentence) is list:
+      sentences = sentence
+      chars_out = [separator.join(list(sentence)) for sentence in sentences]
+  else:
+      chars_out = separator.join(list(sentence))
+  return chars_out
