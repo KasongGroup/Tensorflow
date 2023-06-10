@@ -373,7 +373,7 @@ def visualize_and_predict(model, image_dir = 'test/'):
   
   def split_sentence(sentence):
     """Splits a sentence or list of sentences in a list of charaters.
-    """"
+    """
     separator = ' '
   if type(sentence) is list:
       sentences = sentence
